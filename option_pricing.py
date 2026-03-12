@@ -1,21 +1,38 @@
+from scipy import stats
+from numpy import log, exp, sqrt
 
 
-class zerocoupanbonds:
+def call_option_price(S, E, T, rf, sigma):
+    # first we have to calculate d1 and d2 parameters
+    d1 = (log(S / E) + (rf + sigma * sigma / 2.0) * T) / (sigma * sqrt(T))
+    d2 = d1 - sigma * sqrt(T)
+    print("The d1 and d2 parameters: %s, %s" % (d1, d2))
+    # use the N(x) to calculate the price of the option
+    return S*stats.norm.cdf(d1)-E*exp(-rf*T)*stats.norm.cdf(d2)
 
 
-    def __init__(self, principal, maturity, interest_rate):
-        self.principal = principal
-        self.maturity = maturity
-        self.interest_rate = interest_rate/100
-
-
-    def present_value(self, x, n):
-        return x/(1+self.interest_rate)**n
-
-    def calculate_price(self):
-        return self.present_value(self.principal, self.maturity)
+def put_option_price(S, E, T, rf, sigma):
+    # first we have to calculate d1 and d2 parameters
+    d1 = (log(S / E) + (rf + sigma * sigma / 2.0) * T) / (sigma * sqrt(T))
+    d2 = d1 - sigma * sqrt(T)
+    print("The d1 and d2 parameters: %s, %s" % (d1, d2))
+    # use the N(x) to calculate the price of the option
+    return -S*stats.norm.cdf(-d1)+E*exp(-rf*T)*stats.norm.cdf(-d2)
 
 
 if __name__ == '__main__':
-    bond = zerocoupanbonds(1000, 2, 4)
-    print(bond.calculate_price())
+    # underlying stock price at t=0
+    S0 = 100
+    # strike price
+    E = 100
+    # expiry 1year=365days
+    T = 1
+    # risk-free rate
+    rf = 0.05
+    # volatility of the underlying stock
+    sigma = 0.2
+
+    print("Call option price according to Black-Scholes model: ",
+          call_option_price(S0, E, T, rf, sigma))
+    print("Put option price according to Black-Scholes model: ",
+          put_option_price(S0, E, T, rf, sigma))
